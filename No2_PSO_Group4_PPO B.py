@@ -80,8 +80,8 @@ class PSO:
         ax.clear()
         self.plot_particles(ax)
         ax.set_title(f'Iteration {i}')
-        ax.set_xlim(-20, 20)
-        ax.set_ylim(-20, 20)
+        ax.set_xlim(-100, 100)
+        ax.set_ylim(-100, 100)
         ax.set_zlim(0, 100)
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
@@ -94,11 +94,11 @@ class PSO:
         animation = FuncAnimation(fig, self.animate, frames=n, fargs=(ax,), interval=500, repeat=False)
         plt.show()
 
-x = np.array([1.0, 1.0, 0.0])
-y = np.array([1.0, -1.0, 0.0])
-v = np.array([0.0, 0.0, 0.0])
-c = np.array([1.0, 1.0])
-r = np.array([1.0, 0.5])
+x = np.array([1, -1, 2])
+y = np.array([1, -1, 1])
+v = np.array([0, 0, 0])
+c = np.array([1, 1/2])
+r = np.array([1, 1])
 w = 1
 
 pso = PSO(x, y, v, c, r, w)
