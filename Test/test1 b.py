@@ -32,7 +32,7 @@ class PSO:
                 minIndex = i
         self.gBest = self.x[minIndex]
 
-    def updateV(self):
+    def updateV(self, r1, r2):
         for i in range(len(self.x)):
             self.v[i] = (self.w * self.v[i]) + (self.c[0] * r1 * (self.pBest[i] - self.x[i])) + (self.c[1] * r2 * (self.gBest - self.x[i]))
         print(f"r1 = {r1}, r2 = {r2}")
@@ -54,7 +54,7 @@ class PSO:
             print(f"Iterasi ke-{i + 1}")
             self.findPBest()
             self.findGBest()
-            self.updateV()
+            self.updateV(r1, r2)
             self.updateX()
 
             print("x sebelum =", self.oldX)
@@ -65,12 +65,15 @@ class PSO:
             print("f(x) sebelum =", [f(val) for val in self.oldX])
             print("f(x) sesudah =", [f(val) for val in self.x], "\n")
 
-x = [1.0, np.pi/2, np.pi]
-v = [0, 0, 0]
+# Nilai awal X0 sebagai 10 bilangan acak
+initial_x = np.random.rand(10)
+print("Bilangan acak untuk nilai awal X0:", initial_x)
+
+v = np.zeros(10)
 c = [1/2, 1]
 r1 = np.random.rand()
 r2 = np.random.rand()
 w = 1
 
-pso = PSO(x, v, c, w)
+pso = PSO(initial_x, v, c, w)
 pso.iterate(3)
