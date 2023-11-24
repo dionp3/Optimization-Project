@@ -4,7 +4,7 @@ from matplotlib.animation import FuncAnimation
 from mpl_toolkits.mplot3d import Axes3D
 
 def f(x):
-    return (-2 * x) * np.sin(x)
+    return (-2 * x) * (np.sin(x))
 
 class PSO:
     def __init__(self, x: list, v: list, c: list, r: list, w: float):
@@ -31,22 +31,33 @@ class PSO:
 
     def updateV(self):
         for i in range(len(self.x)):
-            self.v[i] = (self.w * self.v[i]) + (self.c[0] * self.r[0] * (self.pBest[i] - self.x[i])) + (
-                    self.c[1] * self.r[1] * (self.gBest - self.x[i]))
+            self.v[i] = (self.w * self.v[i]) + (self.c[0] * self.r[0] * (self.pBest[i] - self.x[i])) + (self.c[1] * self.r[1] * (self.gBest - self.x[i]))
 
     def updateX(self):
         for i in range(len(self.x)):
             self.oldX[i] = self.x[i]
             self.x[i] = self.x[i] + self.v[i]
-    
-    def print_info(self, i):
-        print(f"Iteration {i}")
+
+    def iterate(self, n):
+        print(f"Iterasi 0")
         print(f"x = {self.x}")
-        print(f"vx = {self.vx}")
-        print(f'pBest = {self.pBestX}')
-        print(f'gBest = {self.gBestX}')
-        print(f'f(gBest x = {f(self.gBestX)}')
+        print(f"v = {self.v}")
         print()
+
+        for i in range(n):
+            print(f"Iterasi", i+1)
+            self.findPBest()
+            self.findGBest()
+            self.updateV()
+            self.updateX()
+
+            print(f'x = {self.x}')
+            print(f'v = {self.v}')
+            print(f'pBest = {self.pBest}')
+            print(f'gBest = {self.gBest}')
+            print(f'f(gBest) = {f(self.gBest)}')
+            print(f'f(x) = {[f(x) for x in self.x]}')
+            print()
 
     def plot_particles(self, ax):
         ax.scatter(self.x, [f(xi) for xi in self.x], c='b', marker='o', label='Particles')
@@ -67,7 +78,16 @@ class PSO:
         ax.set_ylabel('f(X)')
         ax.legend()
 
-    def iterate(self, n):
+        print(f"Iterasi {i+1}")
+        print(f"x = {self.x}")
+        print(f"v = {self.v}")
+        print(f"pBest = {self.pBest}")
+        print(f"gBest = {self.gBest}")
+        print(f"f(gBest) = {f(self.gBest)}")
+        print(f"f(x) = {[f(x) for x in self.x]}")
+        print()
+
+    def iterate_with_animation(self, n):
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
         animation = FuncAnimation(fig, self.animate, frames=n, fargs=(ax,), interval=500, repeat=False)
@@ -80,4 +100,4 @@ r = np.array([1, 1])
 w = 1
 
 pso = PSO(x, v, c, r, w)
-pso.iterate(50)
+pso.iterate_with_animation(50)
