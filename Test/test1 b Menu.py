@@ -96,7 +96,7 @@ class PSO:
             print(f"f(x) = {[round(f(val), 3) for val in self.x]}")
             print()
 
-        # Menghapus plot sebelumnya dan memplot partikel untuk iterasi saat ini
+        # Menghapus plot sebelumnya dan memplot partikel serta gunung untuk iterasi saat ini
         ax.clear()
         self.plot_particles(ax)
         self.plot_surface(ax)
@@ -123,10 +123,13 @@ class PSO:
 # Menampilkan judul
 print("Particle Swarm Optimization Group 4 PPO B\n")
 
+# Input jumlah iterasi dari pengguna
+num_iterations = int(input("Masukkan jumlah iterasi: "))
+
 # Inisialisasi nilai awal X0 sebagai [1.0, np.pi/2, np.pi]
 initial_x = [1.0, np.pi/2, np.pi]
 initial_x_rounded = [round(val, 3) for val in initial_x]
-print("Nilai awal X:", initial_x_rounded, "\n")
+print("\nNilai awal X:", initial_x_rounded, "\n")
 
 # Inisialisasi nilai awal r1 dan r2 sebagai bilangan acak dengan interval dari 0 sampai 1
 r1 = np.random.rand()
@@ -140,5 +143,5 @@ w = 1
 # Membuat objek PSO
 pso = PSO(initial_x, v, c, w)
 
-# Melakukan iterasi dengan animasi sebanyak 3 iterasi
-pso.iterate_with_animation(50)
+# Melakukan iterasi dengan animasi sebanyak num_iterations iterasi
+pso.iterate_with_animation(num_iterations)

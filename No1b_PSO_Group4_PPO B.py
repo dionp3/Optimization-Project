@@ -111,7 +111,7 @@ class PSO:
     def plot_surface(self, ax):
         x = np.linspace(-5, 5, 100)
         y = f(x)
-        ax.plot(x, y, color='gray', alpha=0.5, label='Objective Function')
+        ax.plot(x, y, color='purple', alpha=0.5, label='Objective Function')
 
     # Fungsi untuk iterasi dengan animasi
     def iterate_with_animation(self, n):
@@ -122,6 +122,9 @@ class PSO:
 
 # Menampilkan judul
 print("Particle Swarm Optimization Group 4 PPO B\n")
+
+# Input jumlah iterasi dari pengguna
+num_iterations = int(input("Masukkan jumlah iterasi: "))
 
 # Inisialisasi nilai awal X0 sebagai 10 bilangan acak
 initial_x = np.random.rand(10)
@@ -141,4 +144,4 @@ w = 1
 pso = PSO(initial_x, v, c, w)
 
 # Melakukan iterasi dengan animasi sebanyak 50 iterasi
-pso.iterate_with_animation(50)
+pso.iterate_with_animation(num_iterations)
