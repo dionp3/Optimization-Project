@@ -131,6 +131,13 @@ class PSO:
         animation = FuncAnimation(fig, self.animate, frames=n, fargs=(ax,), interval=500, repeat=False)
         plt.show()
 
+    # Fungsi untuk menampilkan hasil optimasi setelah semua iterasi
+    def print_optimization_result(self):
+        print("\nHasil Optimasi:")
+        print("Nilai Optimal X:", self.gBest[0])
+        print("Nilai Optimal Y:", self.gBest[1])
+        print("Nilai Optimal f(X, Y):", f(self.gBest[0], self.gBest[1]))
+
 # Menampilkan judul
 print("Particle Swarm Optimization Group 4 PPO B\n")
 
@@ -159,3 +166,6 @@ pso = PSO(initial_x, initial_y, v, c, w)
 
 # Melakukan iterasi dengan animasi sebanyak num_iterations iterasi
 pso.iterate_with_animation(num_iterations)
+
+# Menampilkan hasil optimasi setelah semua iterasi
+pso.print_optimization_result()

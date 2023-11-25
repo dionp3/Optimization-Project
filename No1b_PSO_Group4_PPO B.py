@@ -145,3 +145,8 @@ pso = PSO(initial_x, v, c, w)
 
 # Melakukan iterasi dengan animasi sebanyak 50 iterasi
 pso.iterate_with_animation(num_iterations)
+
+# Menampilkan hasil optimasi setelah semua iterasi
+print("Hasil Optimasi:")
+print("Nilai Optimal X:", pso.gBest)
+print("Nilai Optimal f(X):", f(pso.gBest))
