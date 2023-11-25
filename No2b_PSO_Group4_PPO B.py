@@ -101,8 +101,6 @@ class PSO:
             print(f"gBest = {(round(self.gBest[0], 3), round(self.gBest[1], 3))}")
             print(f"f(x, y) sebelum = {[round(f(val[0], val[1]), 3) for val in zip(self.oldX, self.oldY)]}")
             print(f"f(x, y) = {[round(f(val[0], val[1]), 3) for val in zip(self.x, self.y)]}")
-            print(f"y sebelum = {[round(val, 3) for val in self.oldY]}")
-            print(f"y = {[round(val, 3) for val in self.y]}")
             print()
 
         # Menghapus plot sebelumnya dan memplot partikel untuk iterasi saat ini
