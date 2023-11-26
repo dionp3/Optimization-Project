@@ -14,17 +14,15 @@ class PSO:
         # Inisialisasi posisi partikel (x, y), kecepatan partikel (v), koefisien percepatan kognitif dan sosial (c), dan inertia weight (w)
         self.x = x
         self.y = y
-        self.vx = v
-        self.vy = v.copy()
+        self.v = v
         self.c = c
         self.w = w
+
         # Inisialisasi variabel untuk menyimpan posisi partikel sebelumnya, pBest (posisi partikel terbaik), dan gBest (posisi terbaik secara global)
         self.oldX = list(x)
         self.oldY = list(y)
         self.pBest = list(zip(x, y))
         self.gBest = (0, 0)
-        # Inisialisasi v di sini
-        self.v = [(self.vx[i], self.vy[i]) for i in range(len(self.x))]
 
         # Flag untuk menandai iterasi pertama
         self.first_iteration = True
@@ -52,27 +50,14 @@ class PSO:
     # Fungsi untuk mengupdate kecepatan partikel
     def updateV(self, r1, r2):
         for i in range(len(self.x)):
-            self.vx[i] = (self.w * self.vx[i]) + (self.c[0] * r1 * (self.pBest[i][0] - self.x[i])) + (self.c[1] * r2 * (self.gBest[0] - self.x[i]))
-            self.vy[i] = (self.w * self.vy[i]) + (self.c[0] * r1 * (self.pBest[i][1] - self.y[i])) + (self.c[1] * r2 * (self.gBest[1] - self.y[i]))
+            self.v[i] = (self.w * self.v[i]) + (self.c[0] * r1 * (self.pBest[i][0] - self.x[i])) + (self.c[1] * r2 * (self.gBest[0] - self.x[i]))
 
-        # Gabungkan vx dan vy menjadi satu array v
-        self.v = [(self.vx[i], self.vy[i]) for i in range(len(self.x))]
-
-
-            
     # Fungsi untuk mengupdate posisi partikel
     def updateX(self):
-    # Menggabungkan vx dan vy menjadi satu array v
-        self.v = [(self.vx[i], self.vy[i]) for i in range(len(self.x))]
-
         for i in range(len(self.x)):
             self.oldX[i] = self.x[i]
             self.oldY[i] = self.y[i]
-
-            # Menggunakan nilai v untuk memperbarui x dan y
-            self.x[i] = self.x[i] + self.v[i][0]
-            self.y[i] = self.y[i] + self.v[i][1]
-
+            self.x[i] += self.v[i]
 
     # Fungsi untuk plotting partikel dan animasi
     def plot_particles(self, ax):
@@ -84,12 +69,12 @@ class PSO:
         if self.first_iteration:
             # Print informasi untuk iterasi pertama
             print("Iterasi 0")
-            print(f"r1 = {round(self.vx[0], 3)}, r2 = {round(self.vy[0], 3)}")
+            print(f"r1 = {round(self.v[0], 3)}, r2 = {round(self.v[1], 3)}")
             print("x sebelum =", [round(val, 3) for val in self.oldX])
             print("x =", [round(val, 3) for val in self.x])
             print("y sebelum =", [round(val, 3) for val in self.oldY])
             print("y =", [round(val, 3) for val in self.y])
-            print("v =", [tuple(map(lambda x: round(x, 3), val)) for val in self.v])  # Format tuple for printing
+            print("v =", [round(val, 3) for val in self.v])
             print("pBest =", [(round(val[0], 3), round(val[1], 3)) for val in self.pBest])
             print("gBest =", (round(self.gBest[0], 3), round(self.gBest[1], 3)))
             print("f(x, y) sebelum =", [round(f(val[0], val[1]), 3) for val in zip(self.oldX, self.oldY)])
@@ -99,7 +84,8 @@ class PSO:
             # Update pBest, gBest, kecepatan, dan posisi untuk iterasi selanjutnya
             self.findPBest()
             self.findGBest()
-            r1, r2 = self.r[0], self.r[1]  # Menggunakan nilai r1 dan r2 dari input
+            r1 = np.random.rand()
+            r2 = np.random.rand()
             self.updateV(r1, r2)
             self.updateX()
 
@@ -110,7 +96,7 @@ class PSO:
             print(f"x = {[round(val, 3) for val in self.x]}")
             print(f"y sebelum = {[round(val, 3) for val in self.oldY]}")
             print(f"y = {[round(val, 3) for val in self.y]}")
-            print("v =", [tuple(map(lambda x: round(x, 3), val)) for val in self.v])
+            print(f"v = {[round(val, 3) for val in self.v]}")
             print(f"pBest = {[(round(val[0], 3), round(val[1], 3)) for val in self.pBest]}")
             print(f"gBest = {(round(self.gBest[0], 3), round(self.gBest[1], 3))}")
             print(f"f(x, y) sebelum = {[round(f(val[0], val[1]), 3) for val in zip(self.oldX, self.oldY)]}")
@@ -129,6 +115,7 @@ class PSO:
         ax.set_zlabel('f(X, Y)')
         ax.legend()
 
+
     # Fungsi untuk plotting permukaan fungsi objektif sebagai gunung
     def plot_surface(self, ax):
         x = np.linspace(-5, 5, 100)
@@ -144,13 +131,12 @@ class PSO:
         animation = FuncAnimation(fig, self.animate, frames=n, fargs=(ax,), interval=500, repeat=False)
         plt.show()
 
-        # Fungsi untuk menampilkan hasil optimasi setelah semua iterasi
+    # Fungsi untuk menampilkan hasil optimasi setelah semua iterasi
     def print_optimization_result(self):
         print("\nHasil Optimasi:")
-        print("Nilai Optimal X:", round(self.gBest[0], 3))
-        print("Nilai Optimal Y:", round(self.gBest[1], 3))
-        print("Nilai Optimal f(X, Y):", round(f(self.gBest[0], self.gBest[1]), 3))
-
+        print("Nilai Optimal X:", self.gBest[0])
+        print("Nilai Optimal Y:", self.gBest[1])
+        print("Nilai Optimal f(X, Y):", f(self.gBest[0], self.gBest[1]))
 
 # Menampilkan judul
 print("Particle Swarm Optimization Group 4 PPO B\n")
@@ -158,22 +144,25 @@ print("Particle Swarm Optimization Group 4 PPO B\n")
 # Input jumlah iterasi dari pengguna
 num_iterations = int(input("Masukkan jumlah iterasi: "))
 
-# Inisialisasi nilai awal X dan Y sesuai dengan permintaan
-x = [1.0, -1.0, 2.0]
-y = [1.0, -1.0, 1.0]
+# Inisialisasi nilai awal X0 dan Y0 sebagai 10 bilangan acak
+initial_x = np.random.rand(10)
+initial_y = np.random.rand(10)
+initial_x_rounded = [round(val, 3) for val in initial_x]
+initial_y_rounded = [round(val, 3) for val in initial_y]
+print("Bilangan acak nilai awal X:", initial_x_rounded)
+print("Bilangan acak nilai awal Y:", initial_y_rounded, "\n")
 
-# Inisialisasi nilai awal r1 dan r2 sesuai dengan permintaan
-r1 = [1.0, 1.0]
-r2 = [1.0, 1.0]
+# Inisialisasi nilai awal r1 dan r2 sebagai bilangan acak dengan interval dari 0 sampai 1
+r1 = np.random.rand()
+r2 = np.random.rand()
 
-# Inisialisasi nilai awal V sebagai 3 bilangan 0, koefisien c, dan inertia weight w sesuai dengan permintaan
-v = np.zeros(3)
-c = [1.0, 0.5]
-w = 1.0
+# Inisialisasi nilai awal V sebagai 10 bilangan 0, koefisien c, dan inertia weight w
+v = np.zeros(10)
+c = [1/2, 1]
+w = 1
 
 # Membuat objek PSO
-pso = PSO(x, y, v, c, w)
-pso.r = r1
+pso = PSO(initial_x, initial_y, v, c, w)
 
 # Melakukan iterasi dengan animasi sebanyak num_iterations iterasi
 pso.iterate_with_animation(num_iterations)

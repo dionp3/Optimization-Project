@@ -1,6 +1,6 @@
 import numpy as np
 def f(x, y):
-    return 1/3 * np.sqrt(x**2 + y**2 + 25)
+    return (x + y**2 - 13)**2 + (x**2 + y - 9)**2
 
 class PSO():
     def __init__(self, x: list, y: list,v: list, c: list, r: list, w:float):
@@ -82,12 +82,12 @@ class PSO():
             print(f'f(x, y) = {[f(x, y) for x, y in zip(self.x, self.y)]}')
             print()
 
-x = np.array([1.0, 1.0, 0.0])
-y = np.array([1.0 , -1.0, 0.0])
+x = np.array([1.0, -1.0, 2.0])
+y = np.array([1.0 , -1.0, 1.0])
 v = np.array([0.0, 0.0, 0.0])
-c = np.array([1.0, 1.0])
-r = np.array([1.0, 0.5])
+c = np.array([1.0, 0.5])
+r = np.array([1.0, 1.0])
 w = 1
 
 pso = PSO(x, y, v, c, r, w)
-pso.iterate(1500)
+pso.iterate(3)
