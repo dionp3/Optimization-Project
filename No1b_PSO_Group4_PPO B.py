@@ -127,7 +127,7 @@ print("Particle Swarm Optimization Group 4 PPO B\n")
 num_iterations = int(input("Masukkan jumlah iterasi: "))
 
 # Inisialisasi nilai awal X0 sebagai 10 bilangan acak
-initial_x = np.random.rand(10)
+initial_x = np.random.uniform(0, np.pi, 10)
 initial_x_rounded = [round(val, 3) for val in initial_x]
 print("Bilangan acak nilai awal X:", initial_x_rounded, "\n")
 
