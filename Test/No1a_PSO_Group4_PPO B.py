@@ -48,7 +48,7 @@ class PSO:
         ax.scatter(self.x, [f(xi) for xi in self.x], c='b', marker='o', label='Particles')
         ax.scatter(self.gBest, f(self.gBest), c='r', marker='o', s=100, label='Global Best')
 
-    def animate(self, i, ax):
+    def animate(self, i, ax, convergence_threshold):
         if self.first_iteration:
             self.first_iteration = False
         else:
@@ -61,44 +61,50 @@ class PSO:
             self.updateX()
             print(f"pBest = {[round(val, 3) for val in self.pBest]}")
             print(f"gBest x = {round(self.gBest, 3)}")
-            print("gBest f(x) =", round(f(pso.gBest), 3))
+            print(f"gBest f(x) = {round(f(self.gBest), 3)}")
             print(f"v = {[round(val, 3) for val in self.v]}")
             print(f"Update x = {[round(val, 3) for val in self.x]}")
             print(f"Update f(x) = {[round(f(val), 3) for val in self.x]}")
             print()
 
-        ax.clear()
-        self.plot_particles(ax)
-        self.plot_surface(ax)
-        ax.set_title(f'Iteration {i+1}')
-        ax.set_xlim(-5, 5)
-        ax.set_ylim(-5, 5)
-        ax.set_xlabel('X')
-        ax.set_ylabel('f(X)')
-        ax.legend()
+            ax.clear()
+            self.plot_particles(ax)
+            self.plot_surface(ax)
+            ax.set_title(f'Iteration {i+1}')
+            ax.set_xlim(-5, 5)
+            ax.set_ylim(-5, 5)
+            ax.set_xlabel('X')
+            ax.set_ylabel('f(X)')
+            ax.legend()
+
+            if i > 0 and abs(f(self.oldX[0]) - f(self.x[0])) < convergence_threshold:
+                print(f"Konvergensi setelah {i+1} iterasi.")
+                return
+
+            plt.pause(0.5)
 
     def plot_surface(self, ax):
         x = np.linspace(-5, 5, 100)
         y = f(x)
         ax.plot(x, y, color='purple', alpha=0.5, label='Objective Function')
 
-    def iterate_with_animation(self, n):
+    def iterate_with_animation(self, max_iterations, convergence_threshold):
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-        animation = FuncAnimation(fig, self.animate, frames=n, fargs=(ax,), interval=500, repeat=False)
+        animation = FuncAnimation(fig, self.animate, frames=max_iterations, fargs=(ax, convergence_threshold), interval=500, repeat=False)
         plt.show()
 
-    def print_optimization_result(pso):
+    def print_optimization_result(self):
         print("Hasil Optimasi:")
-        print("Nilai Optimal x =", pso.gBest)
-        print("Nilai Optimal f(x) =", f(pso.gBest))
+        print("Nilai Optimal x =", self.gBest)
+        print("Nilai Optimal f(x) =", f(self.gBest))
 
 print("No1a Particle Swarm Optimization Group 4 PPO B\n")
 
 num_iterations = int(input("Masukkan jumlah iterasi: "))
 
 x = [1.0, np.pi/2, np.pi]
-v = np.zeros(3) 
+v = np.zeros(3)
 c = [1/2, 1]
 r = [1, 1]
 w = 1
@@ -112,6 +118,8 @@ print("w =", w,"\n")
 
 pso = PSO(x, v, c, r, w)
 
-pso.iterate_with_animation(num_iterations)
+convergence_threshold = 1e-5
+
+pso.iterate_with_animation(num_iterations, convergence_threshold)
 
 pso.print_optimization_result()

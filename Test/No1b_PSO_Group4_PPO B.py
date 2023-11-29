@@ -64,7 +64,7 @@ class PSO:
             self.updateX()
             print(f"pBest = {[round(val, 3) for val in self.pBest]}")
             print(f"gBest x = {round(self.gBest, 3)}")
-            print("gBest f(x) =", round(f(pso.gBest), 3))
+            print(f"gBest f(x) = {round(f(self.gBest), 3)}")
             print(f"v = {[round(val, 3) for val in self.v]}")
             print(f"Update x = {[round(val, 3) for val in self.x]}")
             print(f"Update f(x) = {[round(f(val), 3) for val in self.x]}")
@@ -107,10 +107,10 @@ class PSO:
                 break
         plt.show()
 
-    def print_optimization_result(pso):
+    def print_optimization_result(self):
         print("Hasil Optimasi:")
-        print("Nilai Optimal x =", pso.gBest)
-        print("Nilai Optimal f(x) =", f(pso.gBest))
+        print("Nilai Optimal x =", self.gBest)
+        print("Nilai Optimal f(x) =", f(self.gBest))
 
 print("No1b Particle Swarm Optimization Group 4 PPO B\n")
 
