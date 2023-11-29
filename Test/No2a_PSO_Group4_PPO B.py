@@ -69,7 +69,7 @@ class PSO:
             self.updateX()
             print(f"pBest = {[(round(val[0], 3), round(val[1], 3)) for val in self.pBest]}")
             print(f"gBest x, y = {(round(self.gBest[0], 3), round(self.gBest[1], 3))}")
-            print(f"gBest f(X, Y) = {round(f(self.gBest[0], self.gBest[1]), 3)}")
+            print(f"gBest f(x, Y) = {round(f(self.gBest[0], self.gBest[1]), 3)}")
             print(f"v = {[tuple(map(lambda x: round(x, 3), val)) for val in self.v]}")
             print(f"Update x = {[round(val, 3) for val in self.x]}")
             print(f"Update y = {[round(val, 3) for val in self.y]}")
@@ -82,9 +82,9 @@ class PSO:
         ax.set_title(f'Iteration {i+1}')
         ax.set_xlim(-5, 5)
         ax.set_ylim(-5, 5)
-        ax.set_xlabel('X')
-        ax.set_ylabel('Y')
-        ax.set_zlabel('f(X, Y)')
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        ax.set_zlabel('f(x, y)')
         ax.legend()
 
     def plot_surface(self, ax):
@@ -106,9 +106,7 @@ class PSO:
         print("Nilai Optimal y =", self.gBest[1])
         print("Nilai Optimal f(x, y) =", f(self.gBest[0], self.gBest[1]))
 
-print("No2b Particle Swarm Optimization Group 4 PPO B\n")
-
-num_iterations = int(input("Masukkan jumlah iterasi: "))
+print("No2a Particle Swarm Optimization Group 4 PPO B\n")
 
 x = [1, -1, 2]
 y = [1, -1, 1]
@@ -117,16 +115,18 @@ c = [1, 1/2]
 r = [1, 1]
 w = 1
 
+print("f(x, y) = (x + y**2 - 13)**2 + (x**2 + y - 9)**2")
 print("\nNilai Awal:")
 print("x =", x)
 print("y =", y)
 print("v =", v)
-print("c =", c)
-print("r =", r)
+print("C =", c)
+print("R =", r)
 print("w =", w,"\n")
 
 pso = PSO(x, y, v, c, r, w)
 
+num_iterations = int(input("Masukkan jumlah iterasi: "))
 pso.iterate_with_animation(num_iterations)
 
 pso.print_optimization_result()

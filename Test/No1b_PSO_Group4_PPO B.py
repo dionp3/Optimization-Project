@@ -86,8 +86,8 @@ class PSO:
         ax.set_title(f'Iteration {i+1}')
         ax.set_xlim(-5, 5)
         ax.set_ylim(-5, 5)
-        ax.set_xlabel('X')
-        ax.set_ylabel('f(X)')
+        ax.set_xlabel('x')
+        ax.set_ylabel('f(x)')
         ax.legend()
 
         return True
@@ -114,8 +114,6 @@ class PSO:
 
 print("No1b Particle Swarm Optimization Group 4 PPO B\n")
 
-num_iterations = int(input("Masukkan jumlah iterasi: "))
-
 x = np.random.uniform(0, np.pi, 3)
 v = np.zeros(3)
 c = [1/2, 1]
@@ -124,15 +122,17 @@ w = 1
 
 tolerance = 0.1
 
+print("f(x) = (-2 * x) * (np.sin(x))")
 print("\nNilai Awal:")
 print("x =", x)
 print("v =", v)
-print("c =", c)
-print("r =", r)
+print("C =", c)
+print("R =", r)
 print("w =", w,"\n")
 
 pso = PSO(x, v, c, r, w)
 
+num_iterations = int(input("Masukkan jumlah iterasi: "))
 pso.iterate_with_animation(num_iterations, tolerance)
 
 pso.print_optimization_result()
