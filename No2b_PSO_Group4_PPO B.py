@@ -166,7 +166,7 @@ r = [np.random.rand(), np.random.rand()]
 w = 1
 
 # Menampilkan informasi nilai awal
-print("f(x, y) = (x + y**2 - 13)**2 + (x**2 + y - 9)**2")
+print("f(x, y) = (x + y^2 - 13)^2 + (x^2 + y - 9)^2  ; -10<=x,y<=10")
 print("\nNilai Awal:")
 print("x =", x)
 print("y =", y)

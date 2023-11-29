@@ -152,7 +152,7 @@ r = [np.random.rand(), np.random.rand()]
 w = 1
 
 # Menampilkan informasi nilai awal
-print("f(x) = (-2 * x) * (np.sin(x))")
+print("f(x) = (-2x)(sin(x))  ;  0<=x<=phi")
 print("\nNilai Awal:")
 print("x =", x)
 print("v =", v)
