@@ -16,6 +16,8 @@ class PSO:
         self.oldX = list(x)
         self.pBest = list(x)
         self.gBest = 0
+        self.tolerance = 1e-5
+        self.animation = None        
         self.first_iteration = True
 
     def findPBest(self):
@@ -45,14 +47,30 @@ class PSO:
             self.x[i] += self.v[i]
 
     def plot_particles(self, ax):
-        ax.scatter(self.x, [f(xi) for xi in self.x], c='b', marker='o', label='Particles')
-        ax.scatter(self.gBest, f(self.gBest), c='r', marker='o', s=100, label='Global Best')
+        particles = ax.scatter(self.x, [f(xi) for xi in self.x], c='b', marker='o', label='Particles')
+        global_best = ax.scatter(self.gBest, f(self.gBest), c='r', marker='o', s=100, label='Global Best')
+        return particles, global_best
 
-    def animate(self, i, ax, tolerance):
-        prevBest = f(self.gBest)
-        unchangedCount = 0
+    def plot_surface(self, ax):
+        x = np.linspace(-5, 5, 100)
+        y = f(x)
+        ax.plot(x, y, color='purple', alpha=0.5, label='Objective Function')
 
+    def iterate_with_animation(self, n):
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        self.animation = FuncAnimation(fig, self.animate, frames=n, fargs=(ax,), interval=500, repeat=False)
+        plt.show()
+
+    def print_optimization_result(self):
+        print("\nHasil Optimasi:")
+        print("Nilai Optimal x =", self.gBest)
+        print("Nilai Optimal f(x) =", f(self.gBest))
+
+    def animate(self, i, ax):
         if self.first_iteration:
+            self.prev_best = f(self.gBest)
+            self.unchanged_count = 0
             self.first_iteration = False
         else:
             print(f"Iterasi {i+1}")
@@ -70,18 +88,23 @@ class PSO:
             print(f"Update f(x) = {[round(f(val), 3) for val in self.x]}")
             print()
 
-            currentBest = f(self.gBest)
-            if abs(currentBest - prevBest) < tolerance:
-                unchangedCount += 1
-            else:
-                unchangedCount = 0
+        current_best = f(self.gBest)
+        if abs(current_best - self.prev_best) < self.tolerance:
+            self.unchanged_count += 1
+        else:
+            self.unchanged_count = 0
 
-            if unchangedCount >= 5:
-                print("Iterasi dihentikan karena konvergensi telah tercapai.")
-                return False
+        self.prev_best = current_best 
+
+        if self.unchanged_count >= 5:
+            print("Iterasi dihentikan karena konvergensi telah tercapai.")
+            if self.animation is not None:
+                self.animation.event_source.stop()
+                pso.print_optimization_result()
+            return None
 
         ax.clear()
-        self.plot_particles(ax)
+        particles, global_best = self.plot_particles(ax)
         self.plot_surface(ax)
         ax.set_title(f'Iteration {i+1}')
         ax.set_xlim(-5, 5)
@@ -90,27 +113,15 @@ class PSO:
         ax.set_ylabel('f(x)')
         ax.legend()
 
-        return True
+        if i >= num_iterations-1:
+            print("Batas iterasi telah tercapai")
+            if self.animation is not None:
+                self.animation.event_source.stop()
+                pso.print_optimization_result()
+            return None
 
-    def plot_surface(self, ax):
-        x = np.linspace(-5, 5, 100)
-        y = f(x)
-        ax.plot(x, y, color='purple', alpha=0.5, label='Objective Function')
-
-    def iterate_with_animation(self, n, tolerance):
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-        animation = FuncAnimation(fig, self.animate, frames=n, fargs=(ax, tolerance), interval=500, repeat=False)
-        for i in range(n):
-            continue_animation = self.animate(i, ax, tolerance)
-            if not continue_animation:
-                break
-        plt.show()
-
-    def print_optimization_result(self):
-        print("Hasil Optimasi:")
-        print("Nilai Optimal x =", self.gBest)
-        print("Nilai Optimal f(x) =", f(self.gBest))
+        if i == 0:
+            ax.legend(handles=[particles, global_best], loc='upper right')       
 
 print("No1b Particle Swarm Optimization Group 4 PPO B\n")
 
@@ -119,8 +130,6 @@ v = np.zeros(3)
 c = [1/2, 1]
 r = [np.random.rand(), np.random.rand()]
 w = 1
-
-tolerance = 0.1
 
 print("f(x) = (-2 * x) * (np.sin(x))")
 print("\nNilai Awal:")
@@ -133,6 +142,4 @@ print("w =", w,"\n")
 pso = PSO(x, v, c, r, w)
 
 num_iterations = int(input("Masukkan jumlah iterasi: "))
-pso.iterate_with_animation(num_iterations, tolerance)
-
-pso.print_optimization_result()
+pso.iterate_with_animation(num_iterations)

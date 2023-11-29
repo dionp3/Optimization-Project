@@ -19,6 +19,8 @@ class PSO:
         self.oldY = list(y)
         self.pBest = list(zip(x, y))
         self.gBest = (0, 0)
+        self.tolerance = 1e-5   
+        self.animation = None
         self.first_iteration = True
 
     def findPBest(self):
@@ -52,11 +54,33 @@ class PSO:
             self.y[i] = self.y[i] + self.v[i][1]
 
     def plot_particles(self, ax):
-        ax.scatter(self.x, self.y, [f(xi, yi) for xi, yi in zip(self.x, self.y)], c='b', marker='o', label='Particles')
-        ax.scatter(self.gBest[0], self.gBest[1], f(self.gBest[0], self.gBest[1]), c='r', marker='o', s=100, label='Global Best')
+        particles = ax.scatter(self.x, self.y, [f(xi, yi) for xi, yi in zip(self.x, self.y)], c='blue', marker='o', label='Particles')
+        global_best = ax.scatter(self.gBest[0], self.gBest[1], f(self.gBest[0], self.gBest[1]), c='red', marker='o', s=100, label='Global Best')
+        return particles, global_best
+    
+    def plot_surface(self, ax):
+        x = np.linspace(-5, 5, 100)
+        y = np.linspace(-5, 5, 100)
+        X, Y = np.meshgrid(x, y)
+        Z = f(X, Y)
+        ax.plot_surface(X, Y, Z, cmap='viridis', alpha=0.5, label='Objective Function')
+
+    def iterate_with_animation(self, n):
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        self.animation = FuncAnimation(fig, self.animate, frames=n, fargs=(ax,), interval=500, repeat=False)
+        plt.show()
+
+    def print_optimization_result(self):
+        print("\nHasil Optimasi:")
+        print("Nilai Optimal x =", self.gBest[0])
+        print("Nilai Optimal y =", self.gBest[1])
+        print("Nilai Optimal f(x, y) =", f(self.gBest[0], self.gBest[1]))
 
     def animate(self, i, ax):
         if self.first_iteration:
+            self.prev_best = f(self.gBest[0], self.gBest[1])
+            self.unchanged_count = 0
             self.first_iteration = False
         else:
             print(f"Iterasi {i+1}")
@@ -76,8 +100,23 @@ class PSO:
             print(f"Update f(x, y) = {[round(f(val[0], val[1]), 3) for val in zip(self.x, self.y)]}")
             print()
 
+        current_best = f(self.gBest[0], self.gBest[1])
+        if abs(current_best - self.prev_best) < self.tolerance:
+            self.unchanged_count += 1
+        else:
+            self.unchanged_count = 0
+
+        self.prev_best = current_best 
+
+        if self.unchanged_count >= 5:
+            print("Iterasi dihentikan karena konvergensi telah tercapai.")
+            if self.animation is not None:
+                self.animation.event_source.stop()
+                pso.print_optimization_result()
+            return None
+
         ax.clear()
-        self.plot_particles(ax)
+        particles, global_best = self.plot_particles(ax)
         self.plot_surface(ax)
         ax.set_title(f'Iteration {i+1}')
         ax.set_xlim(-5, 5)
@@ -87,24 +126,15 @@ class PSO:
         ax.set_zlabel('f(x, y)')
         ax.legend()
 
-    def plot_surface(self, ax):
-        x = np.linspace(-5, 5, 100)
-        y = np.linspace(-5, 5, 100)
-        X, Y = np.meshgrid(x, y)
-        Z = f(X, Y)
-        ax.plot_surface(X, Y, Z, cmap='viridis', alpha=0.5, label='Objective Function')
+        if i >= num_iterations-1:
+            print("Batas iterasi telah tercapai")
+            if self.animation is not None:
+                self.animation.event_source.stop()
+                pso.print_optimization_result()
+            return None
 
-    def iterate_with_animation(self, n):
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-        animation = FuncAnimation(fig, self.animate, frames=n, fargs=(ax,), interval=500, repeat=False)
-        plt.show()
-
-    def print_optimization_result(self):
-        print("\nHasil Optimasi:")
-        print("Nilai Optimal x =", self.gBest[0])
-        print("Nilai Optimal y =", self.gBest[1])
-        print("Nilai Optimal f(x, y) =", f(self.gBest[0], self.gBest[1]))
+        if i == 0:
+            ax.legend(handles=[particles, global_best])
 
 print("No2b Particle Swarm Optimization Group 4 PPO B\n")
 
@@ -128,5 +158,3 @@ pso = PSO(x, y, v, c, r, w)
 
 num_iterations = int(input("Masukkan jumlah iterasi: "))
 pso.iterate_with_animation(num_iterations)
-
-pso.print_optimization_result()
