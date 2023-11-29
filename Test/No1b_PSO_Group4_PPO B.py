@@ -29,7 +29,6 @@ class PSO:
     def findGBest(self):
         minVal = f(self.x[0])
         minIndex = 0
-
         for i in range(1, len(self.x)):
             fx = f(self.x[i])
             if fx < minVal:
