@@ -1,31 +1,24 @@
-# Import library yang diperlukan
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from mpl_toolkits.mplot3d import Axes3D
 
-# Definisi fungsi objektif (fungsi f)
 def f(x):
     return (-2 * x) * (np.sin(x))
 
-# Definisi kelas PSO (Particle Swarm Optimization)
 class PSO:
-    def __init__(self, x, v, c, w):
-        # Inisialisasi posisi partikel (x), kecepatan partikel (v), koefisien percepatan kognitif dan sosial (c), dan inertia weight (w)
+    def __init__(self, x, r1, r2, v, c, w):
         self.x = x
+        self.r1 = r1
+        self.r2 = r2
         self.v = v
         self.c = c
         self.w = w
-
-        # Inisialisasi variabel untuk menyimpan posisi partikel sebelumnya, pBest (posisi partikel terbaik), dan gBest (posisi terbaik secara global)
         self.oldX = list(x)
         self.pBest = list(x)
         self.gBest = 0
-
-        # Flag untuk menandai iterasi pertama
         self.first_iteration = True
 
-    # Fungsi untuk mencari pBest untuk setiap partikel
     def findPBest(self):
         for i in range(len(self.x)):
             if f(self.x[i]) < f(self.pBest[i]):
@@ -33,7 +26,6 @@ class PSO:
             else:
                 self.pBest[i] = self.oldX[i]
 
-    # Fungsi untuk mencari gBest dari semua partikel
     def findGBest(self):
         minVal = f(self.x[0])
         minIndex = 0
@@ -45,46 +37,51 @@ class PSO:
                 minIndex = i
         self.gBest = self.x[minIndex]
 
-    # Fungsi untuk mengupdate kecepatan partikel
-    def updateV(self, r1, r2):
+    def updateV(self):
         for i in range(len(self.x)):
-            self.v[i] = (self.w * self.v[i]) + (self.c[0] * r1 * (self.pBest[i] - self.x[i])) + (self.c[1] * r2 * (self.gBest - self.x[i]))
+            self.v[i] = (self.w * self.v[i]) + (self.c[0] * self.r1 * (self.pBest[i] - self.x[i])) + (self.c[1] * self.r2 * (self.gBest - self.x[i]))
 
-    # Fungsi untuk mengupdate posisi partikel
     def updateX(self):
         for i in range(len(self.x)):
             self.oldX[i] = self.x[i]
             self.x[i] += self.v[i]
 
-    # Fungsi untuk plotting partikel dan animasi
     def plot_particles(self, ax):
         ax.scatter(self.x, [f(xi) for xi in self.x], c='b', marker='o', label='Particles')
         ax.scatter(self.gBest, f(self.gBest), c='r', marker='o', s=100, label='Global Best')
 
-    # Fungsi untuk animasi iterasi
-    def animate(self, i, ax):
+    def animate(self, i, ax, tolerance):
+        prevBest = f(self.gBest)
+        unchangedCount = 0
+
         if self.first_iteration:
             self.first_iteration = False
         else:
-            # Print informasi untuk iterasi selanjutnya
             print(f"Iterasi {i+1}")
-            # Update pBest, gBest, kecepatan, dan posisi untuk iterasi selanjutnya
-            print(f"x sebelum = {[round(val, 3) for val in self.x]}")
-            print(f"f(x) sebelum = {[round(f(val), 3) for val in self.x]}")
+            print(f"x = {[round(val, 3) for val in self.x]}")
+            print(f"f(x) = {[round(f(val), 3) for val in self.x]}")
             self.findPBest()
             self.findGBest()
-            r1 = np.random.rand()
-            r2 = np.random.rand()
-            self.updateV(r1, r2)
+            self.updateV()
             self.updateX()
-            print(f"x = {[round(val, 3) for val in self.x]}")
-            print(f"v = {[round(val, 3) for val in self.v]}")
             print(f"pBest = {[round(val, 3) for val in self.pBest]}")
-            print(f"gBest = {round(self.gBest, 3)}")
-            print(f"f(x) = {[round(f(val), 3) for val in self.x]}")
+            print(f"gBest x = {round(self.gBest, 3)}")
+            print("gBest f(x) =", round(f(pso.gBest), 3))
+            print(f"v = {[round(val, 3) for val in self.v]}")
+            print(f"Update x = {[round(val, 3) for val in self.x]}")
+            print(f"Update f(x) = {[round(f(val), 3) for val in self.x]}")
             print()
 
-        # Menghapus plot sebelumnya dan memplot partikel serta gunung untuk iterasi saat ini
+            currentBest = f(self.gBest)
+            if abs(currentBest - prevBest) < tolerance:
+                unchangedCount += 1
+            else:
+                unchangedCount = 0
+
+            if unchangedCount >= 5:
+                print("Iterasi dihentikan karena konvergensi telah tercapai.")
+                return False
+
         ax.clear()
         self.plot_particles(ax)
         self.plot_surface(ax)
@@ -95,42 +92,51 @@ class PSO:
         ax.set_ylabel('f(X)')
         ax.legend()
 
-    # Fungsi untuk plotting permukaan fungsi objektif sebagai gunung
+        return True
+
     def plot_surface(self, ax):
         x = np.linspace(-5, 5, 100)
         y = f(x)
         ax.plot(x, y, color='purple', alpha=0.5, label='Objective Function')
 
-    # Fungsi untuk iterasi dengan animasi
-    def iterate_with_animation(self, n):
+    def iterate_with_animation(self, n, tolerance):
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-        animation = FuncAnimation(fig, self.animate, frames=n, fargs=(ax,), interval=500, repeat=False)
+        animation = FuncAnimation(fig, self.animate, frames=n, fargs=(ax, tolerance), interval=500, repeat=False)
+        for i in range(n):
+            continue_animation = self.animate(i, ax, tolerance)
+            if not continue_animation:
+                break
         plt.show()
 
-# Menampilkan judul
-print("Particle Swarm Optimization Group 4 PPO B\n")
+    def print_optimization_result(pso):
+        print("Hasil Optimasi:")
+        print("Nilai Optimal x =", pso.gBest)
+        print("Nilai Optimal f(x) =", f(pso.gBest))
 
-# Input jumlah iterasi dari pengguna
+print("No1b Particle Swarm Optimization Group 4 PPO B\n")
+
 num_iterations = int(input("Masukkan jumlah iterasi: "))
 
-# Inisialisasi nilai awal X0 sebagai 10 bilangan acak
-initial_x = np.random.uniform(0, np.pi, 3)
-initial_x_rounded = [round(val, 3) for val in initial_x]
-print("Bilangan acak nilai awal X:", initial_x_rounded, "\n")
-
-# Inisialisasi nilai awal V sebagai 10 bilangan 0, koefisien c, dan inertia weight w
+x = np.random.uniform(0, np.pi, 3)
+r1 = np.random.rand()
+r2 = np.random.rand()
 v = np.zeros(3)
 c = [1/2, 1]
 w = 1
 
-# Membuat objek PSO
-pso = PSO(initial_x, v, c, w)
+tolerance = 0.1
 
-# Melakukan iterasi dengan animasi sebanyak 50 iterasi
-pso.iterate_with_animation(num_iterations)
+print("\nNilai Awal:")
+print("x =", x)
+print("r1 =", r1)
+print("r2 =", r2)
+print("v =", v)
+print("c =", c)
+print("w =", w,"\n")
 
-# Menampilkan hasil optimasi setelah semua iterasi
-print("Hasil Optimasi:")
-print("Nilai Optimal X:", pso.gBest)
-print("Nilai Optimal f(X):", f(pso.gBest))
+pso = PSO(x, r1, r2, v, c, w)
+
+pso.iterate_with_animation(num_iterations, tolerance)
+
+pso.print_optimization_result()
