@@ -7,12 +7,11 @@ def f(x):
     return (-2 * x) * (np.sin(x))
 
 class PSO:
-    def __init__(self, x, r1, r2, v, c, w):
+    def __init__(self, x, v, c, r, w):
         self.x = x
-        self.r1 = r1
-        self.r2 = r2
         self.v = v
         self.c = c
+        self.r = r
         self.w = w
         self.oldX = list(x)
         self.pBest = list(x)
@@ -38,7 +37,7 @@ class PSO:
 
     def updateV(self):
         for i in range(len(self.x)):
-            self.v[i] = (self.w * self.v[i]) + (self.c[0] * self.r1 * (self.pBest[i] - self.x[i])) + (self.c[1] * self.r2 * (self.gBest - self.x[i]))
+            self.v[i] = (self.w * self.v[i]) + (self.c[0] * self.r[0] * (self.pBest[i] - self.x[i])) + (self.c[1] * self.r[1] * (self.gBest - self.x[i]))
 
     def updateX(self):
         for i in range(len(self.x)):
@@ -118,23 +117,21 @@ print("No1b Particle Swarm Optimization Group 4 PPO B\n")
 num_iterations = int(input("Masukkan jumlah iterasi: "))
 
 x = np.random.uniform(0, np.pi, 3)
-r1 = np.random.rand()
-r2 = np.random.rand()
 v = np.zeros(3)
 c = [1/2, 1]
+r = [np.random.rand(), np.random.rand()]
 w = 1
 
 tolerance = 0.1
 
 print("\nNilai Awal:")
 print("x =", x)
-print("r1 =", r1)
-print("r2 =", r2)
 print("v =", v)
 print("c =", c)
+print("r =", r)
 print("w =", w,"\n")
 
-pso = PSO(x, r1, r2, v, c, w)
+pso = PSO(x, v, c, r, w)
 
 pso.iterate_with_animation(num_iterations, tolerance)
 
